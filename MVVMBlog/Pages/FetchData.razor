@@ -1,0 +1,72 @@
+﻿@page "/fetchdata"
+@using MVVMBlog.ViewModels
+@using System.Web
+@implements IDisposable
+@inject FetchDataViewModel FetchDataViewModel
+
+@*Dotnet 6からタブに表示されるページタイトルがサポートされた*@
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (FetchDataViewModel.forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in FetchDataViewModel.forecasts)
+            {
+                <tr>
+                    <td>
+                        <NavLink href=@("fetchdata/" + HttpUtility.UrlEncode(forecast.Date.ToString()))>
+                            @forecast.Date.ToShortDateString()
+                        </NavLink>
+                    </td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+            <tr>
+                <td>
+                        <NavLink href="fetchdata/Error_Case">
+                            Error Case
+                        </NavLink>
+                    </td>
+                    <td>Error Case</td>
+                    <td>Error Case</td>
+                    <td>Error Case</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        FetchDataViewModel.wetherForecastChanged += handler;
+
+        await FetchDataViewModel.GetWetherForecastAsync();
+    }
+
+    public void Dispose()
+    {
+        FetchDataViewModel.wetherForecastChanged -= handler;
+    }
+
+    // 匿名関数は毎回別物として認識されるので、別に関数定義しておく
+    private void handler(Object? s, EventArgs? e) => StateHasChanged();
+}

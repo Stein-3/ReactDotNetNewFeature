@@ -1,0 +1,62 @@
+﻿@page "/fetchdata/{wetherForecastDate}"
+@using MVVMBlog.ViewModels
+@inject FetchData2ViewModel FetchData2ViewModel
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@*Dotnet 6, ErrorBoundary: ChildContentでエラーが発生したとき、ErrorContentを描画する*@
+<ErrorBoundary>
+    <ChildContent>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Temp. (C)</th>
+                    <th>Temp. (F)</th>
+                    <th>Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                        <td>@FetchData2ViewModel.activeForecast.Date.ToShortDateString()</td>
+                        <td>@FetchData2ViewModel.activeForecast.TemperatureC</td>
+                        <td>@FetchData2ViewModel.activeForecast.TemperatureF</td>
+                        <td>@FetchData2ViewModel.activeForecast.Summary</td>
+                    </tr>
+            </tbody>
+        </table>
+    </ChildContent>
+    <ErrorContent>Fail to render</ErrorContent>
+</ErrorBoundary>
+
+@code {
+    private String? _wetherForecastDate;
+
+    [Parameter]
+    public String? WetherForecastDate
+    {
+        get => _wetherForecastDate;
+        set
+        {
+            _wetherForecastDate = value;
+
+            if (value is not null)
+                FetchData2ViewModel.GetActiveForecast(value);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine(WetherForecastDate);
+    }
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine(WetherForecastDate);
+        base.OnParametersSet();
+    }
+}
